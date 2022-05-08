@@ -1,25 +1,37 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
+import { Spinner } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import './App.css';
+import AppRouter from './components/AppRouter';
+import NavBar from './components/NavBar';
+import { check } from './http/userAPI';
+import { setIsAuthInfo, setUserInfo } from './store/UserReducer';
 
-function App() {
+const App = ({dispatch, setUserInfo, setIsAuthInfo}) => {
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+      check().then(data => {
+        setUserInfo(true)
+        setIsAuthInfo(true)
+     }).finally(() => setLoading(false))
+  }, [])
+
+  if(loading){
+    return <Spinner animation={"grow"} />
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <NavBar dispatch = {dispatch}/>
+      <AppRouter />
+    </BrowserRouter>
+  )
 }
 
-export default App;
+let mapStateToProps = (state) => ({
+
+})
+
+export default connect(mapStateToProps, {setUserInfo, setIsAuthInfo})(App);
